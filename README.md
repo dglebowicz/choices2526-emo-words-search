@@ -15,7 +15,7 @@ The classes for searching for emotional words are included in the emo_words_sear
 EmoWordsBase - provides a tool for creating a dictionary of emotional words to search for (emotion: list of words). It creates an initial pre-defined dictionary on initialization and includes methods for modifying the dictionary with user input.
 
 EmoWordsFinder - inherits from EmoWordsBase and provides methods for searching for emotional words: 
-[*] by stem (main method, most suitable with the pre-initialized dictionary: stems the dictionary and the sentences provided, highest likelihood of false positives)
-[*] by lemma (lemmatizes the dictionary and sentences provided, may require modifications to the dictionary)
-[*] by exact match (requires modifications to the dictionary to ensure that all forms of words of interests are included)
+- by stem (main method, most suitable with the pre-initialized dictionary: stems the dictionary and the sentences provided, highest likelihood of false positives)
+- by lemma (lemmatizes the dictionary and sentences provided, may require modifications to the dictionary)
+- by exact match (requires modifications to the dictionary to ensure that all forms of words of interests are included)
 
