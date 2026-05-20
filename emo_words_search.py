@@ -12,8 +12,8 @@ nltk.download('wordnet')
 
 class EmoWordsBase(ABC):
     def __init__(self):
-        self.happy_words = ['happy','joyful','content','pleased','delighted','cheerful','merry','jovial','ecstatic','elated']
-        self.struggling_words = ['struggle','difficulty','challenge','hardship','obstacle','adversity','trial','tribulation','ordeal','setback']
+        self.happy_words = ['happy','joyful','content','pleased','delighted','cheerful','ecstatic','elated']
+        self.struggling_words = ['struggle','difficulty','challenge','hardship','obstacle','tribulation','ordeal','setback']
         self.surprised_words = ['surprise','astonishment','amazement','wonder','shock','disbelief','stunned','startled','flabbergasted']
         self.annoyed_words = ['annoyed','irritated','frustrated','displeased','vexed','aggravated','exasperated','discontented']
         self.unhappy_words = ['unhappy','sad','depressed','miserable','downcast','gloomy','melancholy','sorrowful','heartbroken','despondent']
@@ -66,7 +66,10 @@ class EmoWordsFinder(EmoWordsBase):
             if generate_test:
                 self.sentences = self.generate_test_portfolio()
             else:
-                self.sentences = self.load_pdf(loadpath)
+                if loadpath.endswith('.pdf'):
+                    self.sentences = self.load_pdf(loadpath)
+                elif loadpath.endswith('.txt'):
+                    self.sentences = self.load_txt(loadpath)
         else:
             self.sentences = sentences
     
@@ -79,6 +82,13 @@ class EmoWordsFinder(EmoWordsBase):
         sentences = full_text.split('.')
         return sentences
 
+    def load_txt(self, loadpath):
+        with open(loadpath, 'r', encoding='utf-8') as txt_file:
+            full_text = txt_file.read()
+        sentences = full_text.split('.')
+        return sentences
+
+    
     def find_emotional_words_by_stem(self, method = 'AI'):
         if hasattr(self, 'stemmer') is False:
             self.stem_emotional_words()
@@ -148,6 +158,85 @@ class EmoWordsFinder(EmoWordsBase):
                                 self.search_results_df = pd.concat([
                                     self.search_results_df,
                                     pd.DataFrame({'Emotion': key, 'Word': word.strip(), 'Sentence': sentence, 'Sentence_id': j, 'Search_method': 'stem', 'Validation_method': 'manual'}, index=[0])
+                                ], ignore_index=True)
+                                break
+                            elif user_input.lower() == 'n':
+                                i+=1
+                                break
+                            else:
+                                print("Invalid input. Please enter 'y' or 'n'.")
+                                break
+                    if not found_match:
+                        i+=1
+        
+        
+    def find_emotional_words_by_exact_match(self, method = 'AI'):
+        
+        if hasattr(self, 'search_results_df') is False:
+            self.search_results_df = pd.DataFrame(columns=['Emotion','Word','Sentence','Sentence_id','Search_method','Validation_method'])
+        
+        if method=='AI':
+            self.client = genai.Client()
+            self.sentences_found_exact_ai={}
+            self.words_found_exact_ai = {}
+            for key in self.dict_of_emotional_words.keys():
+                self.sentences_found_exact_ai[key] = []
+                self.words_found_exact_ai[key] = []
+                
+            for j,sentence in enumerate(self.sentences):
+                sentence=sentence.replace('\n', '')
+                for word in sentence.split():
+                    for key in self.dict_of_emotional_words.keys():
+                        
+                        if word.strip().lower() in [w.lower() for w in self.dict_of_emotional_words[key]]:
+                            try:
+                                response = self.client.models.generate_content(
+                                    model="gemini-3.1-flash-lite", 
+                                    contents=f"If the following sentence uses the word {word} to express emotions of the {key} type, then write the word emotional, else write the word nonemotional. Sentence: {sentence}"
+                                )
+                            except:
+                                sleep(10)
+                                response = self.client.models.generate_content(
+                                    model="gemini-3.1-flash-lite", 
+                                    contents=f"If the following sentence uses the word {word} to express emotions of the {key} type, then write the word emotional, else write the word nonemotional. Sentence: {sentence}"
+                                )
+                            if response.text == 'emotional':
+                                self.sentences_found_exact_ai[key].append(sentence)
+                                self.words_found_exact_ai[key].append(word)
+                                self.search_results_df = pd.concat([
+                                    self.search_results_df,
+                                    pd.DataFrame({'Emotion': key, 'Word': word.strip(), 'Sentence': sentence, 'Sentence_id': j, 'Search_method': 'exact', 'Validation_method': 'AI'}, index=[0])
+                                ], ignore_index=True)
+        
+        elif method=='manual':
+            self.sentences_found_exact_manual={}
+            self.words_found_exact_manual={}
+            for key in self.dict_of_emotional_words.keys():
+                self.sentences_found_exact_manual[key] = []
+                self.words_found_exact_manual[key] = []
+            
+            for j,sentence in enumerate(self.sentences):
+                sentence=sentence.replace('\n', '')
+                words = sentence.split()
+                i=0
+
+                while i<len(words):
+                    word = words[i]
+                    found_match = False
+                    for key in self.dict_of_emotional_words.keys():
+                        
+                        if word.strip().lower() in [w.lower() for w in self.dict_of_emotional_words[key]]:
+                            found_match = True
+                            print(f"Emotional word found:\n emotion: {key}, word: {word}\n in: {sentence}")
+                            user_input = input("Is this an emotional word? (y/n): ")
+                            
+                            if user_input.lower() == 'y':
+                                self.sentences_found_exact_manual[key].append(sentence)
+                                self.words_found_exact_manual[key].append(word)
+                                i+=1
+                                self.search_results_df = pd.concat([
+                                    self.search_results_df,
+                                    pd.DataFrame({'Emotion': key, 'Word': word.strip(), 'Sentence': sentence, 'Sentence_id': j, 'Search_method': 'exact', 'Validation_method': 'manual'}, index=[0])
                                 ], ignore_index=True)
                                 break
                             elif user_input.lower() == 'n':
