@@ -46,6 +46,8 @@ Thumbs.db
 *.docx
 *.xlsx
 *.csv
+*.txt
+*.xls
 
 # Node
 node_modules/
