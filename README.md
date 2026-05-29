@@ -8,9 +8,9 @@ The project was created with help of the uv manager. For the easiest start, inst
 
 The script main.py includes a simple loop for finding and manually validating found emotional words in files from a given folder. It saves the final results to a csv file.
 
-For the validation of found words with AI, you will need to add your API key to system path as an environment variable (or you can add it to the client calls in the code explicitly, if you prefer). If you have a paid Gemini version, you can remove the code snippets with time.sleep(x) -- these are put in to avoid exceeding rate limits. In the future, I will improve that to have dynamic sleep times based on whether rate exceed error occurs and how much time has passed. Here's the link from Google on the API key details: [Using Gemini API keys](https://ai.google.dev/gemini-api/docs/api-key?_gl=1*1bxzsga*_up*MQ..&gclid=CjwKCAjw8uTQBhAdEiwAVvtJyorlvXjV849GHqjfY-xjZsyE8oVkw85SfloXdSql1-bnYDT4E3nxWxoCxVAQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAACn9t657ohGwb74CR2DFLdl9tvwWo). 
+For the validation of found words with AI, you will need to add your API key to system path as an environment variable (or you can add it to the client calls in the code explicitly, if you prefer). If you have a paid Gemini version, you can remove the code snippets with sleep(x) -- these are put in to avoid exceeding rate limits. In the future, I will improve that to have dynamic sleep times based on whether rate exceed error occurs and how much time has passed. Here's the link from Google on the API key details: [Using Gemini API keys](https://ai.google.dev/gemini-api/docs/api-key?_gl=1*1bxzsga*_up*MQ..&gclid=CjwKCAjw8uTQBhAdEiwAVvtJyorlvXjV849GHqjfY-xjZsyE8oVkw85SfloXdSql1-bnYDT4E3nxWxoCxVAQAvD_BwE&gclsrc=aw.ds&gbraid=0AAAAACn9t657ohGwb74CR2DFLdl9tvwWo). 
 
-In the notebook emotional_word_gen.ipynb you can find the sample AI generated portfolio to test the tools with. 
+In the notebook emotional_words_gen.ipynb you can find the sample AI generated portfolio to test the tools with. 
 
 ## Module structure
 
